@@ -1,0 +1,14 @@
+('http error', 500, 'Internal Server Error', <httplib.HTTPMessage instance at 0x7ffb560963f8>)
+Traceback (most recent call last):
+  File "./src/pep_reporter.py", line 75, in <module>
+    psc.petide_file_scan(inputfile,outputfile,outputfilename,dir_path,annotf,expfile,qpcrfile)
+  File "/home/anindya/Source_Code_GIT/Peptide_Annotation_Code_ENOSI_addson/src/pep_scan.py", line 196, in petide_file_scan
+    qpcrvalue
+UnboundLocalError: local variable 'qpcrvalue' referenced before assignment
+Traceback (most recent call last):
+  File "./src/pep_reporter.py", line 75, in <module>
+    psc.petide_file_scan(inputfile,outputfile,outputfilename,dir_path,annotf,expfile,qpcrfile)
+  File "/home/anindya/Source_Code_GIT/Peptide_Annotation_Code_ENOSI_addson/src/pep_scan.py", line 23, in petide_file_scan
+    os.mkdir(dir_path+outputfilename+".dir", 0755 );
+OSError: [Errno 17] File exists: '/home/anindya/Source_Code_GIT/Peptide_Annotation_Code_ENOSI_addson/src/Colorectal.dir'
+('http error', 500, 'Internal Server Error', <httplib.HTTPMessage instance at 0x7f0e5aa90680>)

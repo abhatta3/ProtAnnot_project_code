@@ -1,0 +1,188 @@
+'''
+import numpy as np
+import scipy.stats as stats
+import matplotlib.pyplot as plt
+
+h = [0.068719,0.01809,0.168689,0.206744,0.087782,0.10671,0.162944,0.172683,0.115051,0.112487,0.111372,0.189049,0.153794,0.134405,0.109531,0.096598,0.070947,0.153134,0.002051,0.169351,0.103019,0.080841,0.150342,0.219991,0.114856,0.108876,0.131266,0.09302,0.158175,0.162473,0.139389,0.191198,0.023317,0.203463,0.191215,0.09032,0.156906,0.119205,0.053587,0.217635,0.156513,0.19087,0.173592,0.190495,0.161963,0.150439,0.166535,0.183297,0.182186,0.016608,0.260065,0.256609,0.167661,0.159329,0.10304,0.097561,0.199327,0.076254,0.127891,0.053828,0.140012,0.138674,0.130094,0.092203,0.070206,0.13792,0.109421,0.117037,0.125865,0.175332,0.151647,0.166847,0.166987,0.237188,0.108668,0.012381,0.218896,0.056027,0.074546,0.086013,0.199235,0.113137,0.145061,0.254847,0.061639,0.080768,0.136222,0.14003,0.184206,0.089133,0.011558,0.074518]
+h.sort()
+hmean = np.mean(h)
+hstd = np.std(h)
+print(hmean)
+print(hstd)
+
+    
+pdf = stats.norm.pdf(h, hmean, hstd)
+plt.plot(h, pdf,'x-') # including h here is crucial
+
+
+h1 = [0.006226,0.001896,0.153549,0.1329,0.152429,0.002148,0.006079,0.120856,0.207017,0.003715,0.002656,0.001255] 
+
+h1.sort()
+hmean1 = np.mean(h1)
+hstd1 = np.std(h1)
+print(hmean1)
+print(hstd1)
+pdf1 = stats.norm.pdf(h1,hmean1, hstd1)
+print(pdf1)
+plt.plot(h1, pdf1,'o-') # including h here is crucial
+
+
+'''
+"""
+Demo of a simple plot with a custom dashed line.
+
+A Line object's ``set_dashes`` method allows you to specify dashes with
+a series of on/off limport matplotlib.ticker as tickerengths (in points).
+"""
+
+import matplotlib.pyplot as plt
+import math
+import numpy as np
+import matplotlib.ticker as ticker
+
+
+
+#psk=open("PSK_VU_known_all30normal_Protein_Expression.txt","r")
+#rank=open("RANK_VU_known_all30normal_Protein_Expression.txt","r")
+
+
+psk=open("PSK_VU_known_tumor_FDRspec01_Protein_Expression.txt","r")
+rank=open("RANK_VU_known_tumor_FDRspec01_Protein_Expression.txt","r")
+
+#psk=open("PSK_Tumor_ovarian_PNNL_knownDB_FDRspec01_Protein_Expression.txt","r")
+#rank=open("RANK_Tumor_ovarian_PNNL_knownDB_FDRspec01_Protein_Expression.txt","r")
+
+#psk=open("PSK_Tumor_ovarian_JHU_knownDB_FDRspec01_Protein_Expression.txt","r")
+#rank=open("RANK_Tumor_ovarian_JHU_knownDB_FDRspec01_Protein_Expression.txt","r")
+
+def zero_to_nan(values):
+    """Replace every 0 with 'nan' and return a copy."""
+    return [float('nan') if x==0 else x for x in values]
+
+
+
+def read_data_to_sample_dic(filepointer,transform=True):
+    sample_dic={}
+    name_dic={}
+
+    for i,line in enumerate(filepointer):
+        line=line.strip().split("\t")
+        if i==0:
+            for j,word in enumerate(line): 
+                if j<1:
+                    continue
+                exp_dic={}
+              
+                sample_dic[word]=exp_dic
+                name_dic[j-1]=word
+            #print(line)
+            #print(sum_dic)  
+            continue
+
+        for j,word in enumerate(line[1:]):
+            word=float(word)
+            if word!=0 and transform==True:
+                sample_dic[name_dic[j]][i]=np.log10(word)
+            else:
+                sample_dic[name_dic[j]][i]=word
+
+    return sample_dic
+
+psk_data_dic=read_data_to_sample_dic(psk)
+rank_data_dic=read_data_to_sample_dic(rank,False)
+
+
+#outfiler=open("PSK_Tumor_log_R.txt","w")
+#outfilep=open("PSK_Tumor_log_P.txt","w")
+
+i=0
+
+rank_bin={}
+
+for sample in psk_data_dic:
+    pskdatainput=psk_data_dic[sample]
+    rankdatainput=rank_data_dic[sample]
+    r=rankdatainput.values()
+    p=pskdatainput.values()
+    
+    u=max(r)
+    l=min(r)
+    
+    count=0
+    i=l
+    step=100
+    while i<u:
+        nexti=i+step
+        if count in rank_bin:
+            rank_bin[count]=rank_bin[count]+[j for c,j in enumerate(p) if r[c]>=i and r[c]<nexti and j!=0]
+        else:
+            rank_bin[count]=[j for c,j in enumerate(p) if r[c]>=i and r[c]<nexti and j!=0]
+
+        count=count+1
+        i=nexti
+        
+
+
+
+fig, ax = plt.subplots()
+ax.boxplot(rank_bin.values())
+start, end = ax.get_xlim()
+stepsize=10
+ax.xaxis.set_ticks(np.arange(start, end+1+stepsize, stepsize))
+ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('bin%d'))
+
+plt.title("Rank Bins vs. PSK in colorectal tumor")
+plt.xlabel("Rank Bins size 100")
+plt.ylabel("log10(PSK) Values")
+
+
+
+plt.show()
+
+ 
+#plt.boxplot(rank_bin.values())
+
+
+''' 
+# dot plot from 20 samples 
+for sample in psk_data_dic:
+    pskdatainput=psk_data_dic[sample]
+    rankdatainput=rank_data_dic[sample]
+    r=rankdatainput.values()
+    p=pskdatainput.values()
+    p=zero_to_nan(p)
+    r=zero_to_nan(r)
+    #p=sorted(p,reverse=True)
+    #r=sorted(r)
+#    outfiler.write("%s\n" %(sample))
+#   for item in r:
+#        outfiler.write("%s\n" %(item))
+#    outfilep.write("%s\n" %(sample))
+#    for item in p:
+#        outfilep.write("%s\n" %(item))
+#    break
+    
+    if i<30:
+        plt.plot(r, p, '.')
+        i+=1
+'''        
+#plt.show()
+
+'''
+
+import matplotlib.pyplot as plt
+radius = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+area = [3.14159, 12.56636, 28.27431, 50.26544, 78.53975, 113.09724]
+square = [1.0, 4.0, 9.0, 16.0, 25.0, 36.0]
+plt.plot(radius, area, label='Circle')
+plt.plot(radius, square, marker='o', linestyle='--', color='r', label='Square')
+plt.xlabel('Radius/Side')
+plt.ylabel('Area')
+plt.title('Area of Shapes')
+plt.legend()
+plt.show()
+'''
+#dashes = [10, 5, 100, 5]  # 10 points on, 5 off, 100 on, 5 off
+#line.set_dashes(dashes)
+
+

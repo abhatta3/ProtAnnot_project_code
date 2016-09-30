@@ -1,0 +1,109 @@
+import sys
+from Bio import SeqIO, Seq
+import re
+
+'''
+at code also change 
+
+   #sample=linew[0].split('-')[0]
+    sample=linew[0][:-8]
+    #sample=linew[0].split('_')[0]
+
+best on sample patterns
+
+'''
+
+
+#data=open("/home/anindya/Ovarian_known_search/JHU_knownDB_FDRspec01.txt","r")
+#outfile=open("Appended_Ovarian_JHU_knownDB_FDRspec01.txt","w")
+#outlist=open("sample_and_protein_Ovarian_JHU_knownDB_FDRspec01.txt","w")
+
+data=open("/home/anindya/Ovarian_known_search/PNNL_knownDB_FDRspec01.txt","r")
+outfile=open("Appended_Ovarian_PNNL_knownDB_FDRspec01.txt","w")
+outlist=open("sample_and_protein_Ovarian_PNNL_knownDB_FDRspec01.txt","w")
+
+
+
+
+
+
+'''
+filename=sys.argv[1]
+plist=open(filename,"r")
+
+idlist=[]
+for line in plist:
+    linew=line.strip().split("\t")
+    idlist.append(linew[0])
+'''
+
+unif=open("uniprot.seq.tab","r")
+id_l={}
+dic_upep={}
+for line in unif:
+    line=line.strip().split("\t")
+    gene=line[0]
+    uid=line[1]
+    id_l[uid]=1
+    useq=line[2]
+    length=line[3] 
+    if not dic_upep.has_key(gene):
+        dic_t={}
+        dic_t[uid]={'sequence':useq,'length':length}
+        dic_upep[gene]=dic_t 
+    else:
+        dic_upep[gene][uid]={'sequence':useq,'length':length}
+
+
+ensf=open("EnsamblIDTable.txt","r")
+
+dic_ens={}
+
+for line in ensf:
+    line=line.strip().split("\t")
+    gene=line[0]
+    ensid=line[1]
+    dic_ens[ensid]=gene
+
+
+outfile.write("uid\tsample\tscannumber\tpeptide\tlength\n")
+
+
+id_s={}
+
+for i,line in enumerate(data):
+    if i==0:
+        continue  
+    linew=line.strip().split("\t")
+
+    if "Comp" in linew[0]:
+        sample=linew[0].split('_')[1]
+    else:  
+        sample=('_').join(linew[0].split('_')[1:4])
+    
+    #sample=linew[0][:-8]
+    #sample=linew[0].split('_')[0]
+    id_s[sample]=1
+    ensid=linew[9]
+    scannumber=linew[2]
+
+    peptide=linew[8].translate(None, ':-.*!@#$+0123456789')
+    if dic_ens.has_key(ensid):
+        gene=dic_ens[ensid]
+        if dic_upep.has_key(gene):
+            uid_dic=dic_upep[gene]
+            for uid in uid_dic.keys():
+                sequence=uid_dic[uid]['sequence']
+                length=uid_dic[uid]['length']
+                 
+                if peptide in sequence:
+                    outfile.write("%s\t%s\t%s\t%s\t%s\n" %(uid,sample,scannumber,peptide,length))     
+
+for idl in id_l:
+    outlist.write("%s\t" %(idl))
+outlist.write("\n")
+for ids in id_s:
+    outlist.write("%s\t" %(ids))
+outlist.write("\n")
+
+

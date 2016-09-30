@@ -1,0 +1,96 @@
+import sys
+
+
+
+#data=open("Appended_Ovarian_PNNL_knownDB_FDRspec01.txt","r")
+#idlist=open("sample_and_protein_Ovarian_PNNL_knownDB_FDRspec01.txt","r")
+#outfile=open("Tumor_ovarian_PNNL_knownDB_FDRspec01_Protein_Expression.txt","w")
+
+
+data=open("Appended_Ovarian_JHU_knownDB_FDRspec01.txt","r")
+idlist=open("sample_and_protein_Ovarian_JHU_knownDB_FDRspec01.txt","r")
+outfile=open("Tumor_ovarian_JHU_knownDB_FDRspec01.txt","w")
+
+
+
+#data=open("Appended_VU_known_normal_FDRspec01.txt","r")
+#idlist=open("sample_and_protein_VU_known_normal_FDRspec01.txt","r")
+#outfile=open("VU_known_normal_FDRspec01_Protein_Expression.txt","w")
+
+
+#data=open("Appended_Normal_colon_RefSeq_SPECFDR01.txt","r")
+#idlist=open("sample_and_protein_Normal_colon_RefSeq_SPECFDR01.txt","r")
+#outfile=open("Normal_colon_RefSeq_SPECFDR01_Protein_Expression.txt","w")
+
+
+
+#data=open("Appended_VU_known_tumor_FDRspec01.txt","r")
+#idlist=open("sample_and_protein_VU_known_tumor_FDRspec01.txt","r")
+#outfile=open("VU_known_tumor_FDRspec01_Protein_Expression.txt","w")
+
+
+
+
+for i,line in enumerate(idlist):
+    if i==0:
+        uidlist=line.strip().split("\t") 
+    if i==1:
+        samplelist=line.strip().split("\t") 
+
+dic_count={}
+
+for uid in uidlist:
+    for sample in samplelist:
+        if dic_count.has_key(uid):
+            dic_count[uid][sample]=0
+        else:
+            tmp_dic={}
+            tmp_dic[sample]=0 
+            dic_count[uid]=tmp_dic
+
+
+
+
+
+
+uidlength=open("uniprot.seq.tab","r")
+
+length_dic={}
+
+for line in uidlength:
+    line=line.strip().split("\t")
+    length_dic[line[1]]=line[3]
+
+
+
+
+
+for i,line in enumerate(data):
+    if i==0:
+        continue  
+    line=line.strip().split("\t")
+    uid=line[0]
+    sample=line[1]
+    count=dic_count[uid][sample]
+    dic_count[uid][sample]=count+1
+
+outfile.write("Uniprot ID\tLength\t")     
+
+for sid in samplelist:
+    outfile.write("%s\t" %(sid))
+outfile.write("\n")
+        
+for uid in uidlist:
+    if length_dic.has_key(uid):
+        length=length_dic[uid] 
+    else:
+        length='0'
+    outfile.write("%s\t%s\t" %(uid,length))
+
+    for sample in samplelist:
+        outfile.write("%d\t" %(dic_count[uid][sample]))
+    outfile.write("\n")
+
+           
+    
+    

@@ -1,0 +1,51 @@
+from Bio import SeqIO, Seq
+
+data=open("combine_normal_30exp.txt","r")
+#data=open("proteinEXPR_normal_colorectal_p2.txt","r")
+
+outf=open("Colorectal_normal_protein_exp_30_samples.out.txt","w")
+#outf=open("Colorectal_normal_protein_exp_p2.txt","w")
+
+ensmbl_FASTA_dict = {}
+
+for seq_record in SeqIO.parse(open("uniprot_proteome_UP000005640_canonical.fasta"), "fasta"):
+    Header = seq_record.description
+    ID = Header.split("|")[1]
+    ensmbl_FASTA_dict[ID] = len(str(seq_record.seq))
+
+dic_pep={}
+for i,line in enumerate(data):
+    line=line.strip().split("\t")
+    if i>0:
+        if  "-" in line[0]:
+            continue
+
+        if dic_pep.has_key(line[0]):
+            ls=dic_pep[line[0]]
+            for l,item in enumerate(line[2:]):
+                ls[l]=int(ls[l])+int(item)
+        else:
+            ls=line[2:]
+        dic_pep[line[0]]=ls
+
+    else: 
+        outf.write("Protein_Length\t%s\t" %(line[0]))
+        for item in line[2:]:
+            outf.write("%s\t" %(item))
+        outf.write("\n")
+
+for item in dic_pep.keys():
+    if ensmbl_FASTA_dict.has_key(item):
+        length=ensmbl_FASTA_dict[item]
+    else:
+        length=0
+    outf.write("%d\t%s\t" %(length,item))
+       
+    ls=dic_pep[item]
+    for litem in ls:    
+        outf.write("%s\t" %(litem))
+    outf.write("\n")
+
+
+
+    

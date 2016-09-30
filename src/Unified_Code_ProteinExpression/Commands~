@@ -1,0 +1,60 @@
+If mysql client is installed then run the following to get ensembl id from uniprot id
+
+echo -e "P15144\nP04114\nP04233\nE7EN24\nQ12864\nP13688\nQ6UVK1\nQ14574\nP16422\nQ9NZ08\nJ3KNV4\nQ13683\nP05107\nQ6UXG2\nA0A087X2A4\nP15941\nQ9H3R2\nQ99102\nP01833\nO15031\nM0QXM4\nQ15758\nQ15043\nP13866\nQ9NY15\nQ9BX59\nO95497" |\
+awk '{printf("select REF.acc,REF.extAcc1,REF.extAcc2,REF.extAcc3 from uniProt.extDbRef as REF, uniProt.extDb as EXT where EXT.val=\"ENSEMBL\" and EXT.id=REF.extDb and REF.acc=\"%s\";\n",$0);}' |\
+mysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -D hg19 -N>unidmapping.txt
+
+uniprot id mapping alternative is at
+
+ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/
+
+
+
+ls /data/repository/CPTAC/MSSpectra/VU/VU_DT_RefSeq_SPECFDR01.txt
+
+
+get the sample id list
+
+cut -f1 /data/repository/CPTAC/MSSpectra/VU/Normal/Normal_colon_RefSeq_SPECFDR01.txt|sed 's/.mgf//g'|sed 1d|sed 's/_f/\t/g'|cut -f1|awk '!a[$0]++'>normal_colon_sample.txt
+
+
+
+echo "python /Users/anb013/MS_CODE/get_protein_expr.py" | qsub -j oe -l vmem=30G
+
+
+cut -f1 /home/anindya/VU_known_search/VU_known_normal_FDRspec01.txt|sed 1d|sed 's/-/\t/g'|cut -f1|awk '!a[$0]++'>normal_colon_sample.txt 
+
+
+cut -f1 /home/anindya/VU_known_search/VU_known_tumor_FDRspec01.txt|sed 1d|sed 's/_/\t/g'|cut -f1|awk '!a[$0]++'>tcgasampleid.list
+
+
+
+echo "python /Users/anb013/MS_CODE/get_protein_expr.py /Users/anb013/MS_CODE/VU_known_tumor_FDRspec01.txt /Users/anb013/MS_CODE/AllproteinEXPR_tumor.txt" | qsub -j oe -l vmem=20G
+
+echo "python /Users/anb013/MS_CODE/get_protein_expr.py /Users/anb013/MS_CODE/VU_known_normal_FDRspec01.txt /Users/anb013/MS_CODE/AllproteinEXPR_normal.txt" | qsub -j oe -l vmem=20G
+
+
+echo "python /Users/anb013/MS_CODE/get_protein_expr.py /Users/anb013/MS_CODE/Normal_colon_RefSeq_SPECFDR01.txt /Users/anb013/MS_CODE/AllproteinEXPR_normal_p2_4samples.txt" | qsub -j oe -l vmem=20G
+
+
+
+
+
+
+Combine mgid files to single .tsv file 
+echo "python /Users/s3cha/codes/Post/MzidToTsv_withmod.py /data/repository/CPTAC/MSSpectra/PNNL_Incoming/RefSeqResult /Users/s3cha/Anindya/PNNL_batch1_knownDB.tsv" | qsub -j oe -l vmem=20G
+echo "python /Users/s3cha/codes/Post/MzidToTsv_withmod.py /data/repository/CPTAC/MSSpectra/PNNL_Incoming_Batch2/RefSeqResult /Users/s3cha/Anindya/PNNL_batch2_knownDB.tsv" | qsub -j oe -l vmem=20G
+echo "python /Users/s3cha/codes/Post/MzidToTsv_withmod.py /data/repository/CPTAC/MSSpectra/PNNL_Incoming_Batch3/RefSeqResult /Users/s3cha/Anindya/PNNL_batch3_knownDB.tsv" | qsub -j oe -l vmem=20G
+echo "python /Users/s3cha/codes/Post/MzidToTsv_withmod.py /data/repository/CPTAC/MSSpectra/PNNL_Incoming_Batch4/RefSeqResult /Users/s3cha/Anindya/PNNL_batch4_knownDB.tsv" | qsub -j oe -l vmem=20G
+echo "python /Users/s3cha/codes/Post/MzidToTsv_withmod.py /data/repository/CPTAC/MSSpectra/PNNL_Incoming_Batch5/RefSeqResult /Users/s3cha/Anindya/PNNL_batch5_knownDB.tsv" | qsub -j oe -l vmem=20G
+
+
+FDR calculation
+echo "java -Xmx16G -cp /Users/s3cha/MSGFDB_20120106/MSGFecho "java -Xmx16G -cp /Users/s3cha/MSGFDB_20120106/MSGFDB.jar fdr.ComputeFDR -f /Users/s3cha/JHU/RefSeqResult.tsv 9 XXX -i 0 -n 2 -p 8 -s 12 0 -fdr 0.01 -o /Users/s3cha/Anindya/JHU_RefSeqResult_FDRspec01.txt" | qsub -j oe -l vmem=20G
+
+echo "java -Xmx16G -cp /Users/s3cha/MSGFDB_20120106/MSGFDB.jar fdr.ComputeFDR -f /Users/s3cha/JHU/RefSeqResult.tsv 9 XXX -i 0 -n 2 -p 8 -s 12 0 -fdr 0.01 -o /Users/s3cha/Anindya/JHU_RefSeqResult_FDRspec01.txt" | qsub -j oe -l vmem=20G
+
+
+echo "java -Xmx16G -cp /Users/s3cha/MSGFDB_20120106/MSGFDB.jar fdr.ComputeFDR -f /Users/s3cha/Anindya/PNNL_knownDB.tsv 9 XXX -i 0 -n 2 -p 8 -s 12 0 -fdr 0.01 -o /Users/s3cha/Anindya/PNNL_knownDB_FDRspec01.txt" | qsub -j oe -l vmem=20G
+
+

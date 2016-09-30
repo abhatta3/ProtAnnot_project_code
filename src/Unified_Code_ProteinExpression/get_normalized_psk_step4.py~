@@ -1,0 +1,144 @@
+import sys
+from scipy.stats import rankdata
+
+
+#countfile=open("Tumor_ovarian_PNNL_knownDB_FDRspec01_Protein_Expression.txt","r")
+
+#outfile=open("PSK_Tumor_ovarian_PNNL_knownDB_FDRspec01_Protein_Expression.txt","w")
+
+#outfilerank=open("RANK_Tumor_ovarian_PNNL_knownDB_FDRspec01_Protein_Expression.txt","w")
+
+
+
+#countfile=open("Tumor_ovarian_JHU_knownDB_FDRspec01_Protein_Expression.txt","r")
+
+#outfile=open("PSK_Tumor_ovarian_JHU_knownDB_FDRspec01_Protein_Expression.txt","w")
+
+#outfilerank=open("RANK_Tumor_ovarian_JHU_knownDB_FDRspec01_Protein_Expression.txt","w")
+
+
+
+countfile=open("VU_known_tumor_FDRspec01_Protein_Expression.txt","r")
+
+outfile=open("PSK_VU_known_tumor_FDRspec01_Protein_Expression.txt","w")
+
+outfilerank=open("RANK_VU_known_tumor_FDRspec01_Protein_Expression.txt","w")
+
+
+
+#countfile=open("VU_known_all30normal_Protein_Expression.txt","r")
+
+#outfile=open("PSK_VU_known_all30normal_Protein_Expression.txt","w")
+
+#outfilerank=open("RANK_VU_known_all30normal_Protein_Expression.txt","w")
+
+'''
+def rank_simple(vector):
+    return sorted(range(len(vector)), key=vector.__getitem__)
+
+def rankdata(a):
+    n = len(a)
+    ivec=rank_simple(a)
+    svec=[a[rank] for rank in ivec]
+    sumranks = 0
+    dupcount = 0
+    newarray = [0]*n
+    for i in xrange(n):
+        sumranks += i
+        dupcount += 1
+        if i==n-1 or svec[i] != svec[i+1]:
+            averank = sumranks / float(dupcount) + 1
+            for j in xrange(i-dupcount+1,i+1):
+                newarray[ivec[j]] = averank
+            sumranks = 0
+            dupcount = 0
+    return newarray
+'''
+
+
+
+sample_dic={}
+sum_dic={}
+exp_dic={}
+sum_row={}
+for i,line in enumerate(countfile):
+    line=line.strip().split("\t")
+    if i==0:
+        for j,word in enumerate(line): 
+            if j<2:
+                continue
+            sample_dic[j-2]=word
+            sum_dic[word]=0.0
+        continue
+
+    length=float(line[1])*0.01
+    lengthD=float(line[1])*0.01 
+
+    dic_t={}
+    sumrow=0.0
+    for j,word in enumerate(line[2:]):
+        wordU=float(word)/length
+        wordD=float(word)/lengthD
+        sumrow+=int(word)
+        sum_dic[sample_dic[j]]=sum_dic[sample_dic[j]]+wordD
+        dic_t[sample_dic[j]]=wordU
+    exp_dic[line[0]]=dic_t 
+    sum_row[line[0]]=sumrow
+
+outfile.write("Uniprot ID\t")
+
+for sample in sum_dic:
+    outfile.write("%s\t" %(sample))
+outfile.write("\n")
+
+dic_new_data={}
+
+idlist=[]
+
+for uid in exp_dic:
+    if sum_row[uid]==0:
+        continue
+    idlist.append(uid)
+    outfile.write("%s\t" %(uid))
+    for sample in sum_dic:
+        sumval=sum_dic[sample]
+        psk=(exp_dic[uid][sample]/sumval)*1000
+        outfile.write("%f\t" %(psk))
+        if dic_new_data.has_key(sample):
+            sl=dic_new_data[sample]
+            sl.append(psk)
+            dic_new_data[sample]=sl
+        else:
+            sl=[psk]
+            dic_new_data[sample]=sl 
+
+    outfile.write("\n")
+
+
+for sample in dic_new_data:
+    rankdatainput=dic_new_data[sample]
+    newdata=len(rankdatainput)-rankdata(rankdatainput)
+    ez=max(newdata)
+    dic_new_data[sample]=[0 if x==ez else x for x in newdata]
+    #dic_new_data[sample]=[x for x in rankdatainput]
+
+    
+    
+    
+
+outfilerank.write("Uniprot ID\t")
+
+for sample in sum_dic:
+    outfilerank.write("%s\t" %(sample))
+outfilerank.write("\n")
+
+for i,uid in enumerate(idlist):
+    outfilerank.write("%s\t" %(uid))
+    for sample in dic_new_data:
+        dl=dic_new_data[sample]
+        outfilerank.write("%f\t" %(dl[i]))
+    outfilerank.write("\n")
+
+
+
+

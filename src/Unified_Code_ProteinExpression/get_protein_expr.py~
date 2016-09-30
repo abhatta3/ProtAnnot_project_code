@@ -1,0 +1,98 @@
+import sys
+
+'''
+filename=sys.argv[1]
+plist=open(filename,"r")
+
+idlist=[]
+for line in plist:
+    linew=line.strip().split("\t")
+    idlist.append(linew[0])
+'''
+
+mapping=open("unidmapping.txt","r")
+
+data=open("/home/anindya/VU_known_search/VU_known_tumor_FDRspec01.txt","r")
+
+tcga=open("tcgasampleid.list","r")
+
+outfile="AllproteinEXPR.txt"
+
+out=open(outfile,"w")
+
+#outf=open("selected_output_tumor_colorectal_final.txt","w")
+
+#data=open("/home/anindya/VU_known_search/VU_known_normal_FDRspec01.txt","r")
+
+#tcga=open("normal_colon_sample.txt","r")
+
+#out=open("proteinEXPR_normal_colorectal_p2.txt","w")
+
+#outf=open("selected_output_normal_colorectal_p2.txt","w")
+
+sampleid=[]
+
+for line in tcga:
+    line=line.strip().split("\t")
+    if line[0] not in sampleid:
+        sampleid.append(line[0])
+
+idlist=[]
+
+data_count={}
+
+for line in data:
+    linew=line.strip().split("\t")
+    sample=linew[0].split('_')[0]
+    prot=linew[9]
+    k=prot+"|"+sample
+    if k in data_count.keys():
+        c=data_count[k]
+        data_count[k]=c+1
+    else:
+        data_count[k]=1
+    if linew[9] not in idlist:
+        idlist.append(linew[9])
+
+dic_ep={}
+
+for line in mapping:
+    line=line.strip().split("\t")
+    if line[2] in idlist:
+        if line[2] in dic_ep.keys():
+            upl=dic_ep[line[2]]
+            if line[0] not in upl:
+                upl.append(line[0])
+        else:
+            upl=[line[0]]
+            dic_ep[line[2]]=upl
+        #outf.write("%s\t%s\t%s\t%s\n" %(linew[0],linew[2],linew[8],linew[9])) 
+
+print(len(idlist))
+     
+out.write("Uniprot ID\tEnsembl ID\t")     
+for sid in sampleid:
+    out.write("%s\t" %(sid))
+out.write("\n")
+        
+for item in idlist:
+    if item in dic_ep.keys():
+        listup=','.join(dic_ep[item])
+    else:
+        listup='-'
+    out.write("%s\t%s\t" %(listup,item))
+
+    print(listup)
+
+    for sid in sampleid:
+        k=item+"|"+sid
+        if k in data_count.keys(): 
+            count=data_count[k]
+        else:
+            count=0
+        out.write("%d\t" %(count))
+    out.write("\n")
+
+            
+    
+    

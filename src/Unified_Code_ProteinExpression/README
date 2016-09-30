@@ -1,0 +1,12 @@
+Description: proteinE.py takes the PSM output file from Enosi FDR filtered output file. 
+Then the raw PSM count are computed first. Subsequently, normalization and ranking are applied.
+Output are three tab separated files representing protein expressions.
+
+Parameters: python proteinE.py Input_PSM_Result_File_Tab_Separated  SampleID_for_Spectra_Files Output_File
+Example 1.: python proteinE.py /home/anindya/VU_known_search/VU_known_tumor_FDRspec01.txt  ./Input/colorectalidlist.txt new_out.txt
+Example 2.: python proteinE.py /home/anindya/VU_known_search/VU_known_normal_FDRspec01.txt  ./Input/colorectalidlist.txt new_out.txt
+
+Output: File 1. Output_File : Raw PSM count matrix
+        File 2. Normalize_Count_Output_File : Normalize PSM count - Protein Spectra per 100 aminoacid per 1000 spectra (PSK)
+        File 1. Rank_on_Normalize_Count_Output_File : Rank on PSK. Highest expression get rank 1.
+

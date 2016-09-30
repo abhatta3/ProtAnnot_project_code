@@ -1,0 +1,14 @@
+from Bio import SeqIO, Seq
+
+
+outf=open("uniprot.seq.tab","w")
+
+
+for seq_record in SeqIO.parse(open("uniprot_proteome_UP000005640_canonical.fasta"), "fasta"):
+    Header = seq_record.description
+    UNIPROT_ID = Header.split('|')[1]
+    if Header.find('GN=') >-1:
+        Gene_Name= Header.split('GN=')[1].split(' ')[0]
+        Protein_sequence = str(seq_record.seq)
+        outf.write("%s\t%s\t%s\n" %(Gene_Name,UNIPROT_ID,Protein_sequence))
+

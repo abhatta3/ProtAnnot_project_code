@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<parameters>
+<parameter name="FDR.FDR">0.01</parameter>
+<parameter name="FPR.FPR">1.0</parameter>
+<parameter name="c13_nnet.c13">1</parameter>
+<parameter name="c13_nnet.msgfPlusC13">0,1</parameter>
+<parameter name="c13_nnet.msgfPlusNnet">1</parameter>
+<parameter name="c13_nnet.nnet">1</parameter>
+<parameter name="cysteine_protease.cysteine">c57</parameter>
+<parameter name="cysteine_protease.protease">Trypsin</parameter>
+<parameter name="db.DB1">None</parameter>
+<parameter name="db.contaminants">on</parameter>
+<parameter name="dbset_on_server">Colorectal Cancer</parameter>
+<parameter name="desc">Example_spectra_search</parameter>
+<parameter name="email">anindyamail123@gmail.com</parameter>
+<parameter name="filter.filter">FDR</parameter>
+<parameter name="fragmentation.fragmentation">None</parameter>
+<parameter name="instrument.instrument">ESI-ION-TRAP</parameter>
+<parameter name="ptm.mods">1</parameter>
+<parameter name="spec_on_server">f.CCMS_SpectralLibraries/Peptide_Spectral_Libraries/NIST_Libraries/human_2013_06_03_hcd.mgf;</parameter>
+<parameter name="task">fdc128a22b5744de99c3459eba808f4d</parameter>
+<parameter name="tolerance.PM_tolerance">30</parameter>
+<parameter name="tolerance.PM_tolerance_tolerance_unit.PM_unit">30ppm</parameter>
+<parameter name="tolerance_unit.PM_unit">ppm</parameter>
+<parameter name="upload_file_mapping">spectrum-00000.mgf|CCMS_SpectralLibraries/Peptide_Spectral_Libraries/NIST_Libraries/human_2013_06_03_hcd.mgf</parameter>
+<parameter name="user">anindya</parameter>
+<parameter name="uuid">1DDFCD04-5618-0001-6DEB-14501DD54400</parameter>
+<parameter name="workflow">ENOSIC2</parameter>
+</parameters>
